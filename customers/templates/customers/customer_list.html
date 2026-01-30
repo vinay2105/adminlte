@@ -29,6 +29,25 @@
 .search-btn:hover{background:#111827}
 .table-wrapper{max-height:70vh;overflow-y:auto;border-radius:8px}
 .table thead th{position:sticky;top:0;z-index:2}
+@media(max-width:1024px){
+.search-input{width:180px}
+}
+@media(max-width:768px){
+.page-header{flex-direction:column;align-items:flex-start;gap:12px}
+.page-header>div{width:100%;flex-wrap:wrap}
+.search-box{width:100%}
+.search-input{width:100%}
+.add-btn{width:100%}
+.table-wrapper{max-height:none}
+.table{display:block;overflow-x:auto;white-space:nowrap}
+}
+@media(max-width:480px){
+.page-header h2{font-size:16px}
+.table th,.table td{padding:10px 8px;font-size:12px}
+.status{font-size:10px}
+.edit-btn{font-size:11px;padding:5px 8px}
+}
+
 
 </style>
 

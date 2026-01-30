@@ -19,6 +19,19 @@ body{margin:0;height:100vh;background:linear-gradient(135deg,#0f172a,#1f2937);di
 .login-btn{width:100%;padding:11px;border:0;border-radius:6px;background:#3b82f6;color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px}
 .login-btn:hover{background:#2563eb}
 .error{margin-top:14px;color:#f87171;font-size:13px;text-align:center}
+@media(max-width:768px){
+body{padding:16px}
+.login-wrapper{max-width:100%;padding:28px}
+.logo img{max-width:180px}
+}
+@media(max-width:480px){
+.login-wrapper{padding:22px;border-radius:10px}
+.login-title{font-size:15px}
+.form-group label{font-size:12px}
+.form-group input{padding:10px;font-size:13px}
+.login-btn{padding:10px;font-size:13px}
+}
+
 @media(max-width:480px){.login-wrapper{margin:0 16px}}
 </style>
 </head>
