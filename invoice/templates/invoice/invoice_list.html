@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Invoices{% endblock %}
+{% block content %}
+
+<style>
+.card{background:#111827;border-radius:14px;padding:24px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 10px;text-align:left}
+th{font-size:11px;color:#9ca3af;font-weight:700}
+td{font-size:13px}
+tr{border-bottom:1px solid #1f2937}
+.badge{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.paid{background:#064e3b;color:#6ee7b7}
+.partial{background:#78350f;color:#fde68a}
+.unpaid{background:#3f1d1d;color:#fca5a5}
+.btn{padding:6px 12px;border-radius:6px;font-size:12px;
+.scroll{max-height:70vh;overflow-y:auto}
+
+background:#1f2937;color:#e5e7eb;border:1px solid #374151}
+</style>
+
+<div class="card scroll">
+  <h2 style="margin-bottom:16px">Invoices</h2>
+
+  <form method="get" style="margin-bottom:14px;display:flex;gap:10px">
+  <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search name or phone"
+         style="flex:1;background:#1f2937;border:1px solid #374151;color:#e5e7eb;
+                padding:8px 10px;border-radius:6px;font-size:13px">
+  <button class="btn" type="submit">Search</button>
+</form>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>CUSTOMER</th>
+        <th>PERIOD</th>
+        <th>TOTAL</th>
+        <th>PAID</th>
+        <th>PENDING</th>
+        <th>STATUS</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inv in invoices %}
+      <tr>
+        <td>#{{ inv.id }}</td>
+        <td>{{ inv.customer.name }}</td>
+        <td>{{ inv.from_date }} → {{ inv.to_date }}</td>
+        <td>₹{{ inv.total_amount }}</td>
+        <td>₹{{ inv.paid }}</td>
+        <td>₹{{ inv.pending }}</td>
+        <td>
+          {% if inv.pending == 0 %}
+            <span class="badge paid">PAID</span>
+          {% elif inv.paid > 0 %}
+            <span class="badge partial">PARTIAL</span>
+          {% else %}
+            <span class="badge unpaid">UNPAID</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'invoice_detail' inv.id %}">
+            <button class="btn">View</button>
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8">No invoices found</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

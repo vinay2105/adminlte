@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+*.log
+
+# Environment
+.env
+.env.*
+venv/
+env/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Migrations (keep this commented if you want migrations tracked)
+# */migrations/__pycache__/
+
+# Tests / coverage
+.coverage
+htmlcov/
+
+# Node (if ever used)
+node_modules/

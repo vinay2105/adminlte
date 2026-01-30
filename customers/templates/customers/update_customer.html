@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Update Customer{% endblock %}
+{% block content %}
+
+<style>
+.page-wrap{display:flex;justify-content:center}
+.form-page{width:100%;max-width:900px}
+.form-card{background:#111827;border-radius:12px;padding:32px}
+.form-card h3{margin:0 0 24px;font-size:18px;font-weight:600}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.full{grid-column:1 / -1}
+
+label{font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:6px}
+input,textarea{
+  width:100%;padding:10px 12px;border-radius:6px;
+  border:1px solid #374151;background:#1f2937;color:#e5e7eb
+}
+textarea{min-height:80px}
+
+.actions{display:flex;justify-content:flex-end;gap:12px;margin-top:28px}
+.btn{padding:9px 18px;border-radius:6px;font-size:13px;border:0;cursor:pointer}
+.save{background:#3b82f6;color:#fff}
+.cancel{background:#1f2937;border:1px solid #374151;color:#e5e7eb}
+</style>
+
+<div class="page-wrap">
+  <div class="form-page">
+    <div class="form-card">
+      <h3>Update Customer</h3>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="grid">
+          <div>
+            <label>NAME</label>
+            {{ form.name }}
+          </div>
+
+          <div>
+            <label>PHONE</label>
+            {{ form.phone }}
+          </div>
+
+          <div class="full">
+            <label>ADDRESS</label>
+            {{ form.address }}
+          </div>
+
+          <div>
+            <label>AREA</label>
+            {{ form.area }}
+          </div>
+
+          <div class="full">
+            <label>NOTES</label>
+            {{ form.notes }}
+          </div>
+        </div>
+
+        <div class="actions">
+          <a href="{% url 'customer_detail' form.instance.id %}">
+            <button type="button" class="btn cancel">Cancel</button>
+          </a>
+          <button type="submit" class="btn save">Update</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

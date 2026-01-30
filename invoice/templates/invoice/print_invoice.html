@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Invoice #{{ invoice.id }}</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:40px;color:#000}
+    h1{margin-bottom:4px}
+    .muted{color:#555;font-size:13px}
+    table{width:100%;margin-top:20px;border-collapse:collapse}
+    td{padding:8px 0}
+    .label{color:#555}
+    .value{text-align:right;font-weight:600}
+    .total{font-size:18px;font-weight:700}
+    @media print{
+      body{margin:20px}
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Invoice #{{ invoice.id }}</h1>
+  <div class="muted">
+    {{ invoice.customer.name }}<br>
+    Period: {{ invoice.from_date }} → {{ invoice.to_date }}<br>
+    Printed on: {% now "d M Y" %}
+  </div>
+
+  <table>
+    <tr>
+      <td class="label">Total Amount</td>
+      <td class="value total">₹{{ invoice.total_amount }}</td>
+    </tr>
+    <tr>
+      <td class="label">Paid</td>
+      <td class="value">₹{{ paid }}</td>
+    </tr>
+    <tr>
+      <td class="label">Pending</td>
+      <td class="value">₹{{ pending }}</td>
+    </tr>
+  </table>
+  <a href="{% url 'invoice_pdf' invoice.id %}" target="_blank">
+  <button class="btn print">Download PDF</button>
+</a>
+
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Newspapers{% endblock %}
+{% block content %}
+
+<style>
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.page-header h2{font-size:18px;font-weight:600}
+.add-btn{background:#3b82f6;border:0;color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;cursor:pointer}
+.add-btn:hover{background:#2563eb}
+.edit-btn{background:#1f2937;color:#e5e7eb;border:1px solid #374151;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+
+.table{width:100%;border-collapse:collapse;background:#111827;border-radius:8px;overflow:hidden}
+.table th,.table td{padding:12px 14px;font-size:13px;vertical-align:middle}
+.table th{text-align:left;background:#1f2937;color:#9ca3af;font-weight:500}
+.table tr{border-bottom:1px solid #1f2937}
+.table tr:last-child{border-bottom:0}
+
+.status{padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.active{background:#064e3b;color:#6ee7b7}
+.inactive{background:#3f1d1d;color:#fca5a5}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal.show{display:flex}
+.modal-box{background:#111827;border-radius:10px;padding:24px;width:500px;box-shadow:0 20px 50px rgba(0,0,0,.7)}
+.modal-box h3{margin:0 0 16px;font-size:16px;font-weight:600}
+.modal-box label{font-size:11px;font-weight:700;color:#9ca3af;display:block;margin-bottom:5px}
+.modal-box input{width:100%;margin-bottom:14px;padding:9px 10px;border-radius:6px;border:1px solid #374151;background:#1f2937;color:#e5e7eb}
+
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+.cancel-btn{background:#1f2937;border:1px solid #374151}
+.deactivate-btn{background:#7f1d1d;color:#fecaca;border:0;padding:8px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+.activate-btn{background:#064e3b;color:#6ee7b7;border:0;padding:8px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+</style>
+
+<div class="page-header">
+  <h2>Newspapers</h2>
+  <button class="add-btn" onclick="openModal()">+ Add Newspaper</button>
+</div>
+
+<table class="table">
+<thead>
+<tr>
+  <th style="width:40%">Name</th>
+  <th style="width:25%">Price / Day</th>
+  <th style="width:20%">Status</th>
+  <th style="width:15%"></th>
+</tr>
+</thead>
+<tbody>
+{% for n in newspapers %}
+<tr>
+  <td>{{ n.name }}</td>
+  <td>₹ {{ n.price_per_day }}</td>
+  <td>
+    {% if n.is_active %}
+      <span class="status active">Active</span>
+    {% else %}
+      <span class="status inactive">Inactive</span>
+    {% endif %}
+  </td>
+  <td>
+    <a href="?edit={{ n.id }}">
+      <button class="edit-btn">Edit</button>
+    </a>
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="4">No newspapers added</td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+<!-- MODAL -->
+<div class="modal {% if edit_obj %}show{% endif %}" id="modal">
+  <div class="modal-box">
+    <h3>{% if edit_obj %}Edit{% else %}Add{% endif %} Newspaper</h3>
+
+    <form method="post">
+      {% csrf_token %}
+      {% if edit_obj %}
+        <input type="hidden" name="newspaper_id" value="{{ edit_obj.id }}">
+      {% endif %}
+
+      <label>NEWSPAPER NAME</label>
+      {{ form.name }}
+
+      <label>PRICE PER DAY</label>
+      {{ form.price_per_day }}
+
+      {% if edit_obj %}
+        {% if edit_obj.is_active %}
+          <button type="submit" name="deactivate" value="1" class="deactivate-btn">
+            Deactivate
+          </button>
+        {% else %}
+          <button type="submit" name="activate" value="1" class="activate-btn">
+            Activate
+          </button>
+        {% endif %}
+      {% endif %}
+
+      <div class="modal-actions">
+        <button class="add-btn" type="submit">Save</button>
+        <button type="button" class="add-btn cancel-btn" onclick="closeModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const modal=document.getElementById("modal");
+function openModal(){modal.classList.add("show")}
+function closeModal(){window.location.href="{% url 'newspaper' %}"}
+</script>
+
+{% endblock %}
+
+
+

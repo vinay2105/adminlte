@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+
+<style>
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.page-header h2{font-size:18px;font-weight:600}
+.add-btn{background:#3b82f6;border:0;color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;cursor:pointer}
+.add-btn:hover{background:#2563eb}
+.table{width:100%;border-collapse:collapse;background:#111827;border-radius:8px;overflow:hidden}
+.table th,.table td{padding:12px 14px;font-size:13px}
+.table th{background:#1f2937;color:#9ca3af;font-weight:500;text-align:left}
+.table tr{border-bottom:1px solid #1f2937}
+.table tr:last-child{border-bottom:0}
+.status{padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.active{background:#064e3b;color:#6ee7b7}
+.inactive{background:#3f1d1d;color:#fca5a5}
+.edit-btn{background:#1f2937;color:#e5e7eb;border:1px solid #374151;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+.search-box{display:flex;align-items:center;gap:8px}
+.search-input{
+  background:#1f2937;border:1px solid #374151;color:#e5e7eb;
+  padding:8px 12px;border-radius:6px;font-size:13px;width:220px
+}
+.search-input::placeholder{color:#9ca3af}
+.search-btn{
+  background:#1f2937;border:1px solid #374151;color:#e5e7eb;
+  padding:8px 12px;border-radius:6px;font-size:13px;cursor:pointer
+}
+.search-btn:hover{background:#111827}
+.table-wrapper{max-height:70vh;overflow-y:auto;border-radius:8px}
+.table thead th{position:sticky;top:0;z-index:2}
+
+</style>
+
+<div class="page-header">
+  <h2>Customers</h2>
+
+  <div style="display:flex;gap:12px;align-items:center">
+    <form method="get" class="search-box">
+      <input
+        type="text"
+        name="q"
+        class="search-input"
+        placeholder="Search name / phone"
+        value="{{ query }}"
+      >
+      <button type="submit" class="search-btn">Search</button>
+    </form>
+
+    <a href="{% url 'create_customer' %}">
+      <button class="add-btn">+ Add Customer</button>
+    </a>
+  </div>
+</div>
+
+<div class="table-wrapper">
+<table class="table">
+<thead>
+<tr>
+  <th style="width:8%">ID</th>
+  <th style="width:25%">Name</th>
+  <th style="width:20%">Phone</th>
+  <th style="width:20%">Area</th>
+  <th style="width:15%">Status</th>
+  <th style="width:12%"></th>
+</tr>
+</thead>
+<tbody>
+{% for c in customers %}
+<tr>
+  <td>{{ c.id }}</td>
+  <td>{{ c.name }}</td>
+  <td>{{ c.phone }}</td>
+  <td>{{ c.area|default:"-" }}</td>
+  <td>
+    {% if c.is_active %}
+      <span class="status active">Active</span>
+    {% else %}
+      <span class="status inactive">Inactive</span>
+    {% endif %}
+  </td>
+  <td>
+    <a href="{% url "customer_detail" c.id %}">
+      <button class="edit-btn">View Details</button>
+    </a>
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="6">No customers</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+
+{% endblock %}

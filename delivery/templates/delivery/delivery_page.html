@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Daily Deliveries{% endblock %}
+{% block content %}
+
+<style>
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.page-header h2{font-size:18px;font-weight:600}
+.action-bar{display:flex;gap:12px;align-items:center}
+.date-input,.search-input{background:#1f2937;border:1px solid #374151;color:#e5e7eb;padding:8px 12px;border-radius:6px;font-size:13px}
+.search-input{width:220px}
+.btn{background:#1f2937;border:1px solid #374151;color:#e5e7eb;padding:8px 14px;border-radius:6px;font-size:13px;cursor:pointer}
+.btn:hover{background:#111827}
+.primary-btn{background:#3b82f6;border:0;color:#fff}
+.primary-btn:hover{background:#2563eb}
+.table-wrapper{max-height:70vh;overflow-y:auto}
+.table{width:100%;border-collapse:collapse;table-layout:fixed;background:#111827}
+.table th,.table td{padding:12px;font-size:13px;vertical-align:middle;box-sizing:border-box;text-align:left}
+.table th{background:#1f2937;color:#9ca3af}
+.table tr{border-bottom:1px solid #1f2937}
+.table td form{margin:0}
+.table select{width:100%;background:#1f2937;border:1px solid #374151;color:#e5e7eb;padding:8px 10px;border-radius:6px;font-size:13px}
+.status{padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.delivered{background:#064e3b;color:#6ee7b7}
+.not-delivered{background:#3f1d1d;color:#fca5a5}
+.holiday{background:#1e3a8a;color:#93c5fd}
+</style>
+
+
+<div class="page-header">
+  <h2>Deliveries — {{ selected_date }}</h2>
+
+  <form method="get" class="action-bar">
+    <input type="date" name="date"
+           value="{{ selected_date|date:'Y-m-d' }}"
+           class="date-input"
+           onchange="this.form.submit()">
+
+    <input type="text" name="search" class="search-input"
+           placeholder="Search customer"
+           value="{{ request.GET.search }}">
+
+    <button class="btn">Search</button>
+  </form>
+</div>
+
+{% if not deliveries_exist %}
+<form method="post" action="{% url 'generate_deliveries' %}">
+  {% csrf_token %}
+  <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+  <button class="primary-btn btn">Generate Deliveries</button>
+</form>
+{% else %}
+
+<form method="post" action="{% url 'bulk_update_status' %}" style="margin-bottom:12px">
+  {% csrf_token %}
+  <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+  <button name="status" value="DELIVERED" class="btn">Mark All Delivered</button>
+  <button name="status" value="NOT_DELIVERED" class="btn">Mark All Not Delivered</button>
+  <button name="status" value="HOLIDAY" class="btn">Mark All Holiday</button>
+</form>
+
+<div class="table-wrapper">
+<table class="table">
+<thead>
+<tr>
+  <th style="width:30%">Customer</th>
+  <th style="width:25%">Newspaper</th>
+  <th style="width:15%">Price</th>
+  <th style="width:15%">Current Status</th>
+  <th style="width:15%">Change Status</th>
+</tr>
+</thead>
+<tbody>
+{% for d in deliveries %}
+<tr>
+  <td>{{ d.customer.name }}</td>
+  <td>{{ d.newspaper.name }}</td>
+  <td>₹{{ d.price }}</td>
+
+  <td>
+    {% if d.status == "DELIVERED" %}
+      <span class="status delivered">Delivered</span>
+    {% elif d.status == "NOT_DELIVERED" %}
+      <span class="status not-delivered">Not Delivered</span>
+    {% else %}
+      <span class="status holiday">Holiday</span>
+    {% endif %}
+  </td>
+
+  <td>
+    <form method="post" action="{% url 'update_delivery_status' %}">
+      {% csrf_token %}
+      <input type="hidden" name="delivery_id" value="{{ d.id }}">
+      <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+
+      <select name="status"
+              class="search-input"
+              onchange="this.form.submit()">
+
+        <option value="">Change</option>
+        <option value="DELIVERED">Delivered</option>
+        <option value="NOT_DELIVERED">Not Delivered</option>
+        <option value="HOLIDAY">Holiday</option>
+      </select>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+
+{% endif %}
+{% endblock %}
+
+

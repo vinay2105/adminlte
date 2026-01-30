@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<style>
+.wrap{display:grid;gap:20px}
+.card{background:#111827;border-radius:14px;padding:20px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.kpi{background:#0f172a;border:1px solid #1f2937;border-radius:12px;padding:16px}
+.kpi h3{font-size:12px;color:#9ca3af;margin-bottom:6px}
+.kpi div{font-size:22px;font-weight:700}
+.big{font-size:28px;font-weight:800}
+.split{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left}
+th{font-size:11px;color:#9ca3af;letter-spacing:.05em}
+tr{border-bottom:1px solid #1f2937}
+.money{font-weight:600}
+.bad{color:#fca5a5}
+.warn{color:#fde68a}
+.good{color:#6ee7b7}
+.muted{color:#9ca3af;font-size:12px}
+.section-title{font-size:14px;font-weight:700;margin-bottom:10px}
+.chart{height:160px;background:#0f172a;border:1px dashed #374151;border-radius:10px;
+display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:12px}
+</style>
+
+<div class="wrap">
+
+  <!-- ================= TODAY SNAPSHOT ================= -->
+  <div class="card">
+    <div class="row">
+      <h2>Today — {{ today }}</h2>
+      <span class="muted">Daily Operations Snapshot</span>
+    </div>
+
+    <div class="kpis" style="margin-top:16px">
+      <div class="kpi">
+        <h3>Total Deliveries</h3>
+        <div>{{ total_today }}</div>
+      </div>
+      <div class="kpi">
+        <h3>Delivered</h3>
+        <div class="good">{{ delivered_today }}</div>
+      </div>
+      <div class="kpi">
+        <h3>Not Delivered</h3>
+        <div class="bad">{{ not_delivered_today }}</div>
+      </div>
+      <div class="kpi">
+        <h3>Holiday</h3>
+        <div class="warn">{{ holiday_today }}</div>
+      </div>
+      <div class="kpi">
+        <h3>Today Value</h3>
+        <div>₹{{ today_value }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOTAL PENDING ================= -->
+  <div class="card">
+    <div class="row">
+      <div>
+        <div class="muted">TOTAL MONEY PENDING</div>
+        <div class="big">₹{{ total_pending }}</div>
+      </div>
+      <div class="muted" style="max-width:240px;text-align:right">
+        This is the absolute outstanding amount across all customers.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN SPLIT ================= -->
+  <div class="split">
+
+    <!-- TOP PENDING CUSTOMERS -->
+    <div class="card">
+      <div class="section-title">Top Pending Customers</div>
+      <table>
+        <thead>
+          <tr>
+            <th>CUSTOMER</th>
+            <th>PHONE</th>
+            <th>PENDING</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in top_pending %}
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.phone }}</td>
+            <td class="money bad">₹{{ c.pending }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">No pending customers</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- INVOICE HEALTH -->
+    <div class="card">
+      <div class="section-title">Invoice Health (This Month)</div>
+
+      <table>
+        <tr>
+          <td>Billed</td>
+          <td class="money">₹{{ billed_month }}</td>
+        </tr>
+        <tr>
+          <td>Collected</td>
+          <td class="money good">₹{{ paid_month }}</td>
+        </tr>
+        <tr>
+          <td>Pending</td>
+          <td class="money bad">₹{{ pending_month }}</td>
+        </tr>
+      </table>
+
+      <div class="chart" style="margin-top:14px">
+        Monthly collection chart (optional)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= ALERTS ================= -->
+  <div class="card">
+    <div class="section-title">Alerts</div>
+    <div class="muted">
+      No operational issues detected.
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

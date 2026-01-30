@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Customer Detail{% endblock %}
+{% block content %}
+
+<style>
+.card{background:#111827;border-radius:14px;padding:24px;margin-bottom:26px}
+.row{display:flex;justify-content:space-between;align-items:center}
+.section-title{font-size:15px;font-weight:700;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.field{background:#0b1220;border-radius:8px;padding:14px}
+.label{font-size:11px;font-weight:700;color:#9ca3af}
+.value{font-size:14px;margin-top:4px}
+
+.badge{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.active{background:#064e3b;color:#6ee7b7}
+.inactive{background:#3f1d1d;color:#fca5a5}
+.warn{background:#78350f;color:#fde68a}
+
+.actions{display:flex;gap:10px}
+.btn{padding:8px 14px;border-radius:6px;font-size:13px;border:0;cursor:pointer}
+.primary{background:#3b82f6;color:#fff}
+.dark{background:#1f2937;color:#e5e7eb;border:1px solid #374151}
+.danger{background:#7f1d1d;color:#fecaca}
+
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 10px;text-align:left}
+th{font-size:11px;color:#9ca3af;font-weight:700}
+tr{border-bottom:1px solid #1f2937}
+.money{font-weight:600}
+
+/* SELECT DROPDOWN (NEWSPAPER) */
+select{
+  background:#0b1220;
+  border:1px solid #374151;
+  color:#e5e7eb;
+  padding:8px 10px;
+  border-radius:6px;
+  font-size:13px;
+  outline:none;
+  min-width:180px;
+}
+
+select:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 1px #3b82f6;
+}
+
+
+input[type="date"]{
+  background:#0b1220;
+  border:1px solid #374151;
+  color:#e5e7eb;
+  padding:8px 10px;
+  border-radius:6px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator{
+  filter:invert(1);
+  opacity:.6;
+}
+</style>
+
+<!-- CUSTOMER PROFILE -->
+<div class="card">
+  <div class="row">
+    <div>
+      <h2>{{ cust.name }}</h2>
+      <span class="badge {{ cust.is_active|yesno:'active,inactive' }}">
+        {{ cust.is_active|yesno:'Active,Inactive' }}
+      </span>
+    </div>
+
+    <div class="actions">
+      <a href="{% url 'update_customer' cust.id %}">
+        <button class="btn dark">Update</button>
+      </a>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="toggle_customer">
+        <button class="btn danger">
+          {{ cust.is_active|yesno:"Deactivate,Activate" }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:18px">
+    <div class="field"><div class="label">PHONE</div><div class="value">{{ cust.phone }}</div></div>
+    <div class="field"><div class="label">AREA</div><div class="value">{{ cust.area|default:"-" }}</div></div>
+    <div class="field"><div class="label">CREATED</div><div class="value">{{ cust.created_at|date:"d M Y" }}</div></div>
+    <div class="field" style="grid-column:1/-1">
+      <div class="label">ADDRESS</div>
+      <div class="value">{{ cust.address|default:"-" }}</div>
+    </div>
+    <div class="field" style="grid-column:1/-1">
+      <div class="label">NOTES</div>
+      <div class="value">{{ cust.notes|default:"-" }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBSCRIPTION -->
+<div class="card">
+  <div class="section-title">Subscription</div>
+
+  {% if sub %}
+    <div class="grid">
+      <div class="field"><div class="label">NEWSPAPER</div><div class="value">{{ sub.newspaper.name }}</div></div>
+      <div class="field"><div class="label">START DATE</div><div class="value">{{ sub.start_date }}</div></div>
+      <div class="field"><div class="label">STATUS</div><div class="value"><span class="badge active">Active</span></div></div>
+    </div>
+
+    <div class="actions" style="margin-top:16px;justify-content:flex-end">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="change">
+        <select name="newspaper" required>
+          {% for n in newspapers %}
+            <option value="{{ n.id }}">{{ n.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn dark">Change</button>
+      </form>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="end">
+        <button class="btn danger">End</button>
+      </form>
+    </div>
+
+  {% else %}
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add">
+      <select name="newspaper" required>
+        <option value="">Select Newspaper</option>
+        {% for n in newspapers %}
+          <option value="{{ n.id }}">{{ n.name }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn primary">Add Subscription</button>
+    </form>
+  {% endif %}
+</div>
+
+<!-- BILLING SUMMARY -->
+<div class="card">
+  <div class="row">
+    <div class="section-title">Billing Summary</div>
+    <div class="badge warn">Pending ₹{{ balance }}</div>
+  </div>
+</div>
+
+<!-- INVOICES -->
+<div class="card">
+  <div class="row">
+    <div class="section-title">Invoices</div>
+    <form method="post" action="{% url 'generate_invoice' cust.id %}">
+      {% csrf_token %}
+      <input type="date" name="to_date" required>
+      <button class="btn primary">Generate Invoice</button>
+    </form>
+  </div>
+
+  {% if invoices %}
+  <table style="margin-top:14px">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>PERIOD</th>
+        <th>TOTAL</th>
+        <th>PAID</th>
+        <th>PENDING</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inv in invoices %}
+      <tr>
+        <td>#{{ inv.id }}</td>
+        <td>{{ inv.from_date }} → {{ inv.to_date }}</td>
+        <td class="money">₹{{ inv.total_amount }}</td>
+        <td class="money">₹{{ inv.paid }}</td>
+        <td class="money">₹{{ inv.pending }}</td>
+        <td>
+          <a href="{% url 'invoice_detail' inv.id %}">
+            <button class="btn dark">View</button>
+          </a>
+          {% if inv.pending > 0 %}
+          
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="value">No invoices yet</div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+
+
+
+

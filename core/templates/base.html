@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Admin Panel{% endblock %}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+*{box-sizing:border-box;font-family:Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;background:#0f172a;color:#e5e7eb}
+.navbar{height:64px;background:#111827;display:flex;align-items:center;padding:0 24px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.nav-left img{height:20px}
+.nav-center{display:flex;gap:28px;margin-left:auto;margin-right:24px}
+.nav-center a{text-decoration:none;color:#9ca3af;font-size:14px;font-weight:500;position:relative;padding:6px 0;transition:.25s}
+.nav-center a:after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:#3b82f6;transition:.25s}
+.nav-center a:hover{color:#e5e7eb}
+.nav-center a:hover:after,.nav-center a.nav-active:after{width:100%}
+.nav-center a.nav-active{color:#fff;font-weight:600}
+
+.nav-right{position:relative}
+.profile-btn{display:flex;align-items:center;cursor:pointer}
+.profile-btn img{height:30px}
+
+.dropdown{position:absolute;right:0;top:48px;background:#111827;border:1px solid #1f2937;border-radius:8px;min-width:160px;display:none;box-shadow:0 15px 40px rgba(0,0,0,.6)}
+.dropdown a{display:block;padding:10px 14px;font-size:13px;color:#d1d5db;text-decoration:none;transition:.2s}
+.dropdown a:hover{background:#1f2937;color:#fff}
+.dropdown.show{display:block}
+
+.main{padding:24px}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+
+  <!-- LEFT LOGO -->
+  <div class="nav-left">
+    <img src="{% static 'core/AdminLTEFullLogo.png' %}" alt="Logo">
+  </div>
+
+  <!-- CENTER NAV -->
+  <div class="nav-center">
+    <a href="{% url 'dashboard' %}"
+       class="{% if request.resolver_match.url_name == 'dashboard' %}nav-active{% endif %}">
+       Dashboard
+    </a>
+
+    <a href="{% url 'customer' %}" class="{% if request.resolver_match.url_name == 'customer' %}nav-active{% endif %}">Customers</a>
+
+    <a href="{% url 'newspaper' %}"
+       class="{% if request.resolver_match.url_name == 'newspaper' %}nav-active{% endif %}">
+       Newspapers
+    </a>
+
+    <a href="{% url 'delivery' %}"  class="{% if request.resolver_match.url_name == 'delivery' %}nav-active{% endif %}">Deliveries</a>
+    <a href="{% url 'invoice_list' %}" class="{% if request.resolver_match.url_name == 'invoice_list' %}nav-active{% endif %}">Invoices</a>
+  </div>
+
+  <!-- RIGHT PROFILE -->
+  <div class="nav-right">
+    <div class="profile-btn" id="profileBtn">
+      <img src="{% static 'core/AdminLTELogo.png' %}" alt="Profile">
+    </div>
+    <div class="dropdown" id="profileMenu">
+      <a href="{% url 'change_password' %}">Change Password</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+
+</nav>
+
+<div class="main">
+  {% block content %}{% endblock %}
+</div>
+
+<script>
+const btn=document.getElementById("profileBtn"),
+menu=document.getElementById("profileMenu");
+btn.onclick=e=>{e.stopPropagation();menu.classList.toggle("show")}
+document.onclick=()=>menu.classList.remove("show")
+</script>
+
+</body>
+</html>
+
+
