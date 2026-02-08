@@ -20,7 +20,9 @@ padding:0 24px;
 box-shadow:0 4px 20px rgba(0,0,0,.4);
 position:relative;
 z-index:1001;
+justify-content:space-between;
 }
+
 
 /* HAMBURGER BUTTON */
 .menu-btn{
@@ -30,6 +32,13 @@ cursor:pointer;
 color:#e5e7eb;
 margin-right:16px;
 }
+
+.nav-left{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
 
 /* LOGO */
 .nav-left img{height:20px}
@@ -163,12 +172,11 @@ pointer-events:auto;
 <nav class="navbar">
 
   <!-- HAMBURGER -->
-  <div class="menu-btn" id="menuBtn">☰</div>
-
-  <!-- LOGO -->
   <div class="nav-left">
-    <img src="{% static 'core/AdminLTEFullLogo.png' %}" alt="Logo">
-  </div>
+  <div class="menu-btn" id="menuBtn">☰</div>
+  <img src="{% static 'core/AdminLTEFullLogo.png' %}" alt="Logo">
+</div>
+
 
   <!-- DESKTOP NAV -->
   <div class="nav-center">
