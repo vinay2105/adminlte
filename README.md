@@ -1,4 +1,4 @@
-# Newspaper Distribution Management System (Django + AdminLTE)
+# Newspaper Distribution Management System 
 
 A real-world Django business management application for handling newspaper subscriptions, daily deliveries, invoicing, and payments. The system demonstrates structured CRUD architecture, accounting workflows, and admin-focused dashboards using Django and AdminLTE.
 
@@ -6,11 +6,11 @@ A real-world Django business management application for handling newspaper subsc
 
 ## Demo
 
-👉 **Live Demo:** _[Add demo link here]_
+👉 **Live Demo:** https://adminlte-x4nw.onrender.com/
 
 **Demo Credentials (demo data only)**  
-Username: `demo_admin`  
-Password: `demo@123`
+Username: admin  
+Password: admin
 
 > This account contains demo data created for evaluation purposes.  
 > It is intended only to showcase system functionality.
