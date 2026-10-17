@@ -1,111 +1,154 @@
-# Newspaper Distribution Management System 
+# Newspaper Distribution Management System
 
-A real-world Django business management application for handling newspaper subscriptions, daily deliveries, invoicing, and payments. The system demonstrates structured CRUD architecture, accounting workflows, and admin-focused dashboards using Django and AdminLTE.
+A Django business management application for newspaper subscriptions, daily deliveries, invoicing, and payments. It includes an AdminLTE interface, an operational dashboard, PDF invoice reporting, and an authenticated Django REST Framework API.
 
 ---
 
 ## Demo
 
-👉 **Live Demo:** https://adminlte-x4nw.onrender.com/
+**Live Demo:** https://adminlte-x4nw.onrender.com/
 
-**Demo Credentials (demo data only)**  
-Username: admin  
-Password: admin
+**Demo credentials (demo data only)**
 
-> This account contains demo data created for evaluation purposes.  
-> It is intended only to showcase system functionality.
+- Username: `admin`
+- Password: `admin`
 
----
-
-## Key Features
-
-- **Customer Management (CRUD)**
-  - Create, update, and manage customer records
-  - Link customers to active newspaper subscriptions
-
-- **Subscription Management**
-  - Assign newspapers to customers
-  - Manage pricing and subscription status
-
-- **Daily Delivery Tracking**
-  - Generate and manage date-based delivery records
-  - Track delivery status per customer
-
-- **Invoice Generation**
-  - Create invoices from delivery records
-  - Snapshot pricing to preserve billing accuracy
-  - Prevent modification of finalized invoices
-
-- **Payment Tracking**
-  - Record partial and multiple payments
-  - Calculate outstanding balances automatically
-  - Maintain invoice-linked payment history
-
-- **Admin Dashboard**
-  - Operational summaries
-  - Billing and payment insights
-  - Delivery tracking overview
-
-- **Authentication System**
-  - Staff-only access
-  - Secure login and session handling
+This account contains demo data for evaluation.
 
 ---
 
-## Tech Stack
+## Features
 
-- **Backend:** Django
-- **Frontend:** AdminLTE + Django Templates
-- **Database:** Relational database via Django ORM
-- **Reporting:** PDF generation with ReportLab
-- **Authentication:** Django built-in auth system
+- Customer and subscription management
+- Newspaper catalog and pricing
+- Date-based delivery generation and status tracking
+- Invoice creation from deliveries, with pricing snapshots
+- Partial and multiple payment tracking
+- Dashboard summaries for operations and billing
+- Staff authentication and session handling
+- PDF reports generated with ReportLab
+- Authenticated JSON API for core business records
 
----
+## Tech stack
 
-## Architecture Overview
+- **Backend:** Django and Django REST Framework
+- **Frontend:** AdminLTE and Django templates
+- **Database:** Relational database through Django ORM
+- **Reporting:** ReportLab
+- **Authentication:** Django authentication and DRF authentication
 
-The project is organized into modular Django apps aligned with business domains:
+## Architecture
 
-### `core`
-Handles authentication and dashboard analytics.
+- `core` - authentication and dashboard analytics
+- `customers` - customer records and subscriptions
+- `newspaper` - newspaper catalog and pricing
+- `delivery` - daily delivery records and status
+- `invoice` - invoices, delivery linkage, and payments
+- `api` - DRF serializers, viewsets, and router-based endpoints
 
-### `customers`
-Manages customer records and subscription relationships.
+## Business workflow
 
-### `newspaper`
-Defines newspaper catalog and pricing models.
-
-### `delivery`
-Tracks daily delivery records and status.
-
-### `invoice`
-Implements invoice creation, delivery linkage, and payment tracking.
-
-Each app encapsulates its own models, views, templates, and URLs, ensuring separation of concerns and maintainable architecture.
-
----
-
-## Business Workflow
-
-1. Newspapers are defined with pricing.
-2. Customers are registered and assigned subscriptions.
-3. Daily deliveries are generated from active subscriptions.
-4. Invoices are created from recorded deliveries.
-5. Payments are recorded against invoices.
-6. The dashboard aggregates operational and financial metrics.
-
-This workflow mirrors a practical newspaper distribution business with structured accounting controls.
+1. Define newspapers and prices.
+2. Register customers and assign subscriptions.
+3. Generate daily deliveries from active subscriptions.
+4. Create invoices from recorded deliveries.
+5. Record payments against invoices.
+6. Review operational and financial summaries in the dashboard.
 
 ---
 
-## Security & Environment
+## REST API
 
-The application uses Django’s authentication system with restricted staff access. Sensitive configuration such as secret keys and environment variables should be managed securely outside version control.
+All endpoints are prefixed with `/api/` and return JSON. Requests require an authenticated Django user. DRF's default session and HTTP Basic authentication are supported. Use HTTPS when sending Basic credentials. An unauthenticated request may receive `401 Unauthorized` or `403 Forbidden`, depending on the authentication method and request.
+
+### Endpoint reference
+
+| Resource | Collection URL | Detail URL | Supported operations |
+| --- | --- | --- | --- |
+| Customers | `/api/customers/` | `/api/customers/{id}/` | List, retrieve, create, update (`PUT`/`PATCH`), delete |
+| Newspapers | `/api/newspapers/` | `/api/newspapers/{id}/` | List, retrieve, create, update (`PUT`/`PATCH`), delete |
+| Subscriptions | `/api/subscriptions/` | `/api/subscriptions/{id}/` | List, retrieve, create, update (`PUT`/`PATCH`), delete |
+| Deliveries | `/api/deliveries/` | `/api/deliveries/{id}/` | List and retrieve only |
+| Invoices | `/api/invoices/` | `/api/invoices/{id}/` | List and retrieve only |
+| Payments | `/api/payments/` | `/api/payments/{id}/` | List and retrieve only |
+
+`{id}` is the numeric ID of the record. Deliveries, invoices, and payments are read-only through the API; unsupported write operations return `405 Method Not Allowed`. Deleting a customer, newspaper, or subscription referenced by other records returns `409 Conflict`.
+
+### Authentication
+
+Example using HTTP Basic authentication:
+
+```bash
+curl --user username:password https://your-host.example/api/customers/
+```
+
+Use a Django account that can log in to the application. With session authentication, log in first and send the session cookie and CSRF token with write requests.
+
+### Create requests
+
+Create a customer:
+
+```bash
+curl --user username:password \
+  --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"name":"Asha Patel","phone":"555-0101","address":"12 Market Road","area":"North","is_active":true}' \
+  https://your-host.example/api/customers/
+```
+
+Create a newspaper by sending this JSON to `POST /api/newspapers/`:
+
+```json
+{
+  "name": "Daily News",
+  "price_per_day": "5.00",
+  "is_active": true
+}
+```
+
+Create a subscription by sending this JSON to `POST /api/subscriptions/`. The customer and newspaper IDs must already exist:
+
+```json
+{
+  "customer": 1,
+  "newspaper": 1,
+  "start_date": "2026-01-01",
+  "end_date": null,
+  "is_active": true
+}
+```
+
+IDs and creation timestamps are generated by the server. Fields marked read-only in responses should not be included when creating or updating records.
+
+### Read-only endpoints and filters
+
+Delivery responses include `customer_name` and `newspaper_name`. Filter deliveries by date (`YYYY-MM-DD`) or customer ID, and payments by invoice ID:
+
+```text
+GET /api/deliveries/?date=2026-01-01
+GET /api/deliveries/?customer=1
+GET /api/deliveries/?date=2026-01-01&customer=1
+GET /api/payments/?invoice=1
+```
+
+### Common status codes
+
+- `200 OK` - successful list, retrieve, or update
+- `201 Created` - successful create
+- `204 No Content` - successful delete
+- `400 Bad Request` - invalid or incomplete input
+- `401 Unauthorized` or `403 Forbidden` - authentication required or denied
+- `404 Not Found` - the requested record does not exist
+- `405 Method Not Allowed` - operation is unsupported for that resource
+- `409 Conflict` - deletion is blocked by related records
 
 ---
+
+## Security and environment
+
+Sensitive configuration, including secret keys and database credentials, should be stored in environment variables and kept out of version control. Use HTTPS in production.
 
 ## Author
 
 **Vinay Kumar Sharma**  
-Django Backend Developer — Business Systems
-
+Django Backend Developer - Business Systems
