@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.conf import settings
 from customers.models import Customer 
+from decimal import Decimal
 
 
 class Invoice(models.Model):
@@ -71,7 +72,7 @@ class Payment(models.Model):
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)]
+        validators=[MinValueValidator(Decimal("0.01"))]
     )
 
     payment_date = models.DateField()

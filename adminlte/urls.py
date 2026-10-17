@@ -29,6 +29,7 @@ def root_redirect(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', root_redirect),
+    path('api/', include('api.urls')),
     path('login/', core.views.login_view, name='login'),
     path('logout/', core.views.logout_view, name='logout'),
     path("change-password/", core.views.change_password_view, name="change_password"),
